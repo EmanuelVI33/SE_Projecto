@@ -88,7 +88,7 @@ class _ListReglas extends StatelessWidget {
     // final listVar = dataProvider.listVar;
     if (reglas.isEmpty) {
       return const Text(
-        'No existe ninguna variable',
+        'No existe ninguna regla',
         textAlign: TextAlign.center,
         style: TextStyle(
             fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),

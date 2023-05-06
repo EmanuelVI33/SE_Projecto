@@ -1,7 +1,7 @@
 import 'package:archivos_prueba/models/models.dart';
 import 'package:archivos_prueba/providers/providers.dart';
 import 'package:archivos_prueba/ui/auth_decoration.dart';
-import 'package:archivos_prueba/widgets/dialog_rule.dart';
+import 'package:archivos_prueba/widgets/dialog_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +31,7 @@ class DialogAddForm extends StatelessWidget {
         style: const TextStyle(fontWeight: FontWeight.bold),
         textAlign: TextAlign.center,
       ),
-      content: Form(
+      content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -134,7 +134,7 @@ class DialogAddForm extends StatelessWidget {
                           formLiteralProvider.selectOption == 'premisa')) {
                     await showDialog(
                       context: context,
-                      builder: (context) => const DialogRule(
+                      builder: (context) => const DialogCustom(
                           title: 'Error',
                           content: 'Verifique que esten los datos completos'),
                     );

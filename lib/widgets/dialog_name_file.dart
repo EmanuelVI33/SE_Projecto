@@ -1,7 +1,7 @@
 import 'package:archivos_prueba/providers/data_provider.dart';
 import 'package:archivos_prueba/providers/file_provider.dart';
 import 'package:archivos_prueba/widgets/dialog_change_var.dart';
-import 'package:archivos_prueba/widgets/dialog_rule.dart';
+import 'package:archivos_prueba/widgets/dialog_custom.dart';
 import 'package:flutter/material.dart';
 
 class DialogNameFile extends StatelessWidget {
@@ -42,7 +42,7 @@ class DialogNameFile extends StatelessWidget {
               Navigator.pop(context);
               await showDialog(
                 context: context,
-                builder: (context) => const DialogRule(
+                builder: (context) => const DialogCustom(
                     title: 'Extensión incorecta',
                     content: 'Los archivos tiene extenxió .txt'),
               );

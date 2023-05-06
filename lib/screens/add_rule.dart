@@ -2,7 +2,7 @@ import 'package:archivos_prueba/models/models.dart';
 import 'package:archivos_prueba/providers/data_provider.dart';
 import 'package:archivos_prueba/providers/form_literal_provider.dart';
 import 'package:archivos_prueba/providers/form_rule_provider.dart';
-import 'package:archivos_prueba/widgets/dialog_rule.dart';
+import 'package:archivos_prueba/widgets/dialog_custom.dart';
 import 'package:archivos_prueba/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -124,8 +124,11 @@ class AddRule extends StatelessWidget {
                                       await showDialog(
                                         context: context,
                                         builder: (context) => DialogDeleteVar(
-                                            function: () => formRuleProvider
-                                                .deleteLiteral(index),
+                                            function: () {
+                                              formRuleProvider
+                                                  .deleteLiteral(index);
+                                              Navigator.pop(context);
+                                            },
                                             title:
                                                 '¿Deseas eliminar el literal?'),
                                       );
@@ -228,7 +231,7 @@ class AddRule extends StatelessWidget {
                               await showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return const DialogRule(
+                                  return const DialogCustom(
                                     title: 'Regla incorecta',
                                     content:
                                         'Debe agregar la premisa y la conclusión',

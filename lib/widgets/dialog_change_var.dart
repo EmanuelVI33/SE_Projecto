@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:archivos_prueba/models/models.dart';
 import 'package:archivos_prueba/providers/data_provider.dart';
 import 'package:archivos_prueba/providers/form_variable_provider.dart';
@@ -28,16 +26,18 @@ class DialogChangeVar extends StatelessWidget {
         : 'Cambiar de numérica a escalar';
     return AlertDialog(
       title: const Text('¿Estas seguro de modificar la variable?'),
-      content: Container(
-        width: 200,
-        height: 100,
-        child: ListView.builder(
-          itemCount: reglas.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text('Regla ${reglas[index]}'),
-            );
-          },
+      content: SingleChildScrollView(
+        child: Container(
+          width: 200,
+          height: 100,
+          child: ListView.builder(
+            itemCount: reglas.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text('Regla ${reglas[index]}'),
+              );
+            },
+          ),
         ),
       ),
       icon: const Icon(

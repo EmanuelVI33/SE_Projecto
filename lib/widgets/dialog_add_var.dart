@@ -21,51 +21,57 @@ class DialogAddVar extends StatelessWidget {
         'Añadir variable',
         textAlign: TextAlign.center,
       ),
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            autocorrect: false,
-            keyboardType: TextInputType.name,
-            decoration: InputDecorations.authInputDecorations(
-                hintText: '', labelText: 'Name', prefixIcon: Icons.abc_rounded),
-            onChanged: (value) => formVariable.name = value,
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Row(
-                children: [
-                  Radio(
-                      value: 'numerica',
-                      groupValue: formVariable.tipoVariable,
-                      onChanged: (value) => formVariable.tipoVariable = value),
-                  const Text(
-                    'Numérica',
-                    style: textStyle,
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Radio(
-                      value: 'escalar',
-                      groupValue: formVariable.tipoVariable,
-                      onChanged: (value) => formVariable.tipoVariable = value),
-                  const Text(
-                    'Escalar',
-                    style: textStyle,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              autocorrect: false,
+              keyboardType: TextInputType.name,
+              decoration: InputDecorations.authInputDecorations(
+                  hintText: '',
+                  labelText: 'Name',
+                  prefixIcon: Icons.abc_rounded),
+              onChanged: (value) => formVariable.name = value,
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Row(
+                  children: [
+                    Radio(
+                        value: 'numerica',
+                        groupValue: formVariable.tipoVariable,
+                        onChanged: (value) =>
+                            formVariable.tipoVariable = value),
+                    const Text(
+                      'Numérica',
+                      style: textStyle,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio(
+                        value: 'escalar',
+                        groupValue: formVariable.tipoVariable,
+                        onChanged: (value) =>
+                            formVariable.tipoVariable = value),
+                    const Text(
+                      'Escalar',
+                      style: textStyle,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       actions: [
         Row(

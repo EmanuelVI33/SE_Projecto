@@ -16,57 +16,62 @@ class MostrarVariables extends StatelessWidget {
     final dataProvider = Provider.of<DataProvider>(context);
     return Scaffold(
       appBar: const MyAppBar(title: 'Variables'),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              const Text(
-                'Variables',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                const Text(
+                  'Variables',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'add_variable');
-                  },
-                  icon: const Icon(
-                    Icons.add_box_rounded,
-                    size: 35,
-                    color: Colors.blueAccent,
-                  )),
-            ],
-          ),
-          Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.indigo,
-              ),
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              child: _ListVariable(dataProvider: dataProvider)),
-          SizedBox(
-            height: 15,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                'Mantener presionado para eliminar',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black26),
-              ),
-              Icon(
-                Icons.delete,
-                size: 20,
-                color: Colors.redAccent,
-              ),
-            ],
-          )
-        ],
+                IconButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const DialogAddVar(),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.add_box_rounded,
+                      size: 35,
+                      color: Colors.blueAccent,
+                    )),
+              ],
+            ),
+            Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.indigo,
+                ),
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                child: _ListVariable(dataProvider: dataProvider)),
+            SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  'Mantener presionado para eliminar',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.black26),
+                ),
+                Icon(
+                  Icons.delete,
+                  size: 20,
+                  color: Colors.redAccent,
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -80,8 +85,14 @@ class _ListVariable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final variables = dataProvider.getVariables();
-    // final listVar = dataProvider.listVar;
-    print(variables.length.toDouble());
+    if (variables.isEmpty) {
+      return const Text(
+        'No existe ninguna variable',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+      );
+    }
 
     return SizedBox(
       height: variables.length.toDouble() * 70,

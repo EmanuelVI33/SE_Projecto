@@ -1,4 +1,5 @@
 import 'package:archivos_prueba/providers/providers.dart';
+import 'package:archivos_prueba/widgets/dialog_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
             showDialog(
               context: context,
               builder: (context) => DialogGuardar(
-                function: () => fileProvider.writeToFile(mapText),
+                title: '¿Desear guardar los cambios?',
+                function: () {
+                  fileProvider.writeToFile(mapText);
+                  Navigator.pop(context);
+                },
               ),
             );
           },
@@ -28,8 +33,16 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         IconButton(
           onPressed: () {
-            fileProvider.fileName = '';
-            Navigator.of(context).popUntil((route) => route.isFirst);
+            showDialog(
+              context: context,
+              builder: (context) => DialogGuardar(
+                title: '¿Quieres cerrar el archivo?',
+                function: () {
+                  fileProvider.fileName = '';
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+              ),
+            );
           },
           icon: const Icon(Icons.close_rounded),
         ),
@@ -42,21 +55,22 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class DialogGuardar extends StatelessWidget {
-  const DialogGuardar({super.key, required this.function});
+  const DialogGuardar({super.key, required this.function, required this.title});
 
+  final String title;
   final VoidCallback function;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Deseas guardar el archivo?'),
+      title: Text(title),
       actions: [
-        ElevatedButton(onPressed: function, child: Text('Aceptar')),
+        ElevatedButton(onPressed: function, child: const Text('Aceptar')),
         ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text('Cancelar')),
+            child: const Text('Cancelar')),
       ],
     );
   }

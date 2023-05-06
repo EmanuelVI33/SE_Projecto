@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DialogRule extends StatelessWidget {
-  const DialogRule({super.key, required this.title, required this.content});
+class DialogCustom extends StatelessWidget {
+  const DialogCustom({super.key, required this.title, required this.content});
 
   final String title;
   final String content;

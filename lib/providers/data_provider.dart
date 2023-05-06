@@ -141,7 +141,7 @@ class DataProvider extends ChangeNotifier {
 
   // Obtener valores de variable escalar
   List<String> getValoresEsc(String id) {
-    List<dynamic> list = variables[id]['valores'];
+    List<dynamic> list = variables[id]['valores'] ?? [];
     List<String> l = [];
     for (var elem in list) {
       String e = elem.toString();

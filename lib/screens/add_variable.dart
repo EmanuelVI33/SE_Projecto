@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:archivos_prueba/models/models.dart';
 import 'package:archivos_prueba/providers/providers.dart';
 import 'package:archivos_prueba/ui/auth_decoration.dart';
@@ -7,8 +6,6 @@ import 'package:archivos_prueba/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:path_provider/path_provider.dart';
-
 class AddVariable extends StatelessWidget {
   const AddVariable({super.key});
 
@@ -16,23 +13,20 @@ class AddVariable extends StatelessWidget {
   Widget build(BuildContext context) {
     final formVariable = Provider.of<FormVariableProvider>(context);
     final dataProvider = Provider.of<DataProvider>(context);
-    final Map<String, dynamic> variables = dataProvider.getVariables();
 
     return Scaffold(
       appBar: const MyAppBar(
         title: 'Añadir variable',
       ),
-      body: Column(
-        children: [
-          _LoginForm(
-            dataProvider: dataProvider,
-            formVariable: formVariable,
-          ),
-          // _ListVariable(
-          //   dataProvider: dataProvider,
-          //   formVar: formVariable,
-          // )
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _LoginForm(
+              dataProvider: dataProvider,
+              formVariable: formVariable,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -126,23 +120,23 @@ class _LoginForm extends StatelessWidget {
                   itemCount: formVariable.valores.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(formVariable.valores[index]),
+                      title: Text('$index ${formVariable.valores[index]}'),
                     );
                   },
                 ),
               ),
-            if (formVariable.tipoVariable == 'numerica')
-              TextFormField(
-                initialValue: formVariable.rango,
-                autocorrect: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecorations.authInputDecorations(
-                    hintText: '1:20',
-                    labelText: 'Rango',
-                    prefixIcon: Icons.alternate_email_rounded),
-                onChanged: (value) => formVariable.rango = value,
-              ),
-            const SizedBox(height: 30),
+            // if (formVariable.tipoVariable == 'numerica')
+            //   TextFormField(
+            //     initialValue: formVariable.rango,
+            //     autocorrect: false,
+            //     keyboardType: TextInputType.emailAddress,
+            //     decoration: InputDecorations.authInputDecorations(
+            //         hintText: '1:20',
+            //         labelText: 'Rango',
+            //         prefixIcon: Icons.alternate_email_rounded),
+            //     onChanged: (value) => formVariable.rango = value,
+            //   ),
+            // const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -168,7 +162,7 @@ class _LoginForm extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
             MaterialButton(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -199,7 +193,7 @@ class _LoginForm extends StatelessWidget {
                     Numeric numerica = Numeric(
                         id: int.parse(formVariable.id),
                         name: formVariable.name,
-                        valor: formVariable.valor,
+                        valor: double.parse(formVariable.valor),
                         rango: formVariable.rango);
 
                     dataProvider.addNumeric(numerica);
@@ -235,46 +229,6 @@ class _LoginForm extends StatelessWidget {
           reglas: list,
         );
       },
-    );
-  }
-}
-
-class _ListVariable extends StatelessWidget {
-  final DataProvider dataProvider;
-  final FormVariableProvider formVar;
-
-  const _ListVariable(
-      {super.key, required this.dataProvider, required this.formVar});
-
-  @override
-  Widget build(BuildContext context) {
-    final listVar = dataProvider.listVar;
-    final map = dataProvider.map;
-    return SizedBox(
-      height: (listVar.length.toDouble()) * 50,
-      child: ListView.builder(
-        itemCount: listVar.length,
-        itemBuilder: (context, index) {
-          bool isNumeric = map[listVar[index]]['tipo'];
-          String tipo = isNumeric ? 'numerica' : 'escalar';
-          return ListTile(
-            title: Text('${listVar[index]} $tipo'),
-            onTap: () async {
-              formVar.isLoading = !formVar.isLoading;
-              await showDialog(
-                context: context,
-                builder: (context) {
-                  return DialogEditVar(
-                    identVar: listVar[index],
-                    formVar: formVar,
-                  );
-                },
-              );
-              formVar.isLoading = !formVar.isLoading;
-            },
-          );
-        },
-      ),
     );
   }
 }
