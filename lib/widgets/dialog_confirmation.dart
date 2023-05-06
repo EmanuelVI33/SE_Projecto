@@ -22,8 +22,6 @@ class CustomDialog extends StatelessWidget {
     void initData() async {
       // lee del archivo
       dataProvider.map = await fileProvider.readFromFileToMap();
-      dataProvider.setListVar();
-      // Inicializa la variable inicial
       dataProvider.initVariable();
     }
 
@@ -35,7 +33,7 @@ class CustomDialog extends StatelessWidget {
           child: const Text('Si'),
           onPressed: () async {
             initData();
-            Navigator.pushNamed(context, 'menu');
+            Navigator.popAndPushNamed(context, 'menu');
           },
         ),
         ElevatedButton(

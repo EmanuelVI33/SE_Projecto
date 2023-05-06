@@ -1,6 +1,7 @@
 class Variable {
-  String ident;
+  int id;
+  String name;
   bool tipo; // True: Numeric || False: Escalar
 
-  Variable(this.ident, this.tipo);
+  Variable(this.id, this.name, this.tipo);
 }

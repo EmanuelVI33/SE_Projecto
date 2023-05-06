@@ -6,6 +6,10 @@ class FormLiteralProvider extends ChangeNotifier {
   String _selectOption = 'premisa';
   String _variableValue = '';
   String _operadorValue = '';
+  bool _negacion = false;
+  String? id;
+  bool? tipoVariable;
+  String? valorEscalar;
   Literal? _literal;
   dynamic _value;
 
@@ -41,6 +45,18 @@ class FormLiteralProvider extends ChangeNotifier {
 
   set literal(value) {
     _literal = value;
+    notifyListeners();
+  }
+
+  void setValorEscalar(value) {
+    valorEscalar = value;
+    notifyListeners();
+  }
+
+  bool get negacion => _negacion;
+
+  set negacion(value) {
+    _negacion = value;
     notifyListeners();
   }
 }

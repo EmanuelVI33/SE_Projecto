@@ -30,7 +30,7 @@ class DialogEditVar extends StatelessWidget {
                 onPressed: () {
                   Map<String, dynamic> variable = dataProvider.map[identVar];
                   bool isNumeric = variable['tipo'];
-                  formVar.ident = identVar;
+                  formVar.name = identVar;
                   if (isNumeric) {
                     formVar.valor = variable['valor'];
                     formVar.rango = variable['rango'];

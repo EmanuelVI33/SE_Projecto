@@ -3,86 +3,114 @@ import 'dart:convert';
 import 'package:archivos_prueba/models/models.dart';
 import 'package:flutter/material.dart';
 
-class FoundException implements Exception {
-  const FoundException();
-}
-
 class DataProvider extends ChangeNotifier {
-  Map<String, dynamic> map = {};
-  Map<String, dynamic> _variable = {};
+  Map<dynamic, dynamic> map = {'variables': {}, 'reglas': {}};
+  int nroVariable = 0;
   int nroRegla = 0;
   List<String> _listVar = [];
-  List<Scale> _listVarScale = [];
-  List<Numeric> _listVarNumeric = [];
-
-  void init() {
-    // map.forEach((key, value) {
-    //   if (value['tipo']) {
-    //     // Si es numeric
-    //     _listVarNumeric.add(Numeric(key, value['valor'], value['rango']));
-    //   } else {
-    //     _listVarScale.add(Scale(key, value['valores']));
-    //   }
-    // });
-
-    // Asignar el número de regla
-    if (map.containsKey('nroRegla')) {
-      nroRegla = map['nroRegla'];
-    } else {
-      // Agregamos el número de regla
-      map['nroRegla'] = 0;
-    }
-  }
 
   // Inicializa una variable
   void initVariable() {
-    try {
-      map.forEach((key, value) {
-        String s = key[0];
-        if (!(s.codeUnitAt(0) > 47 && s.codeUnitAt(0) < 58)) {
-          // Si no empieza con número es una variable
-          _variable = value;
-          throw const FoundException();
-        }
-      });
-    } catch (e) {
-      return;
-    }
+    nroVariable = cantVariables();
+    nroRegla = cantReglas();
+    setListVar();
+  }
+
+  Map<String, dynamic> get variables => map['variables'];
+
+  Map<String, dynamic> get reglas => map['reglas'];
+
+  int cantVariables() {
+    return variables.length;
+  }
+
+  int cantReglas() {
+    return reglas.length;
   }
 
   // Añadir una variable escalar al objeto
   void addScale(Scale s) {
-    map[s.ident] = <String, dynamic>{'valores': s.valores, 'tipo': s.tipo};
+    int id;
+    if (nroVariable == s.id) {
+      // Añadir variable
+      id = nroVariable;
+    } else {
+      // Ya existe la variable
+      id = s.id;
+    }
+
+    map['variables'][id.toString()] = s.toMap();
+    nroVariable = cantVariables();
+    addListVar(s.name);
+
     notifyListeners();
   }
 
   // Añadir una variable escalar al objeto
   void addNumeric(Numeric n) {
-    map[n.ident] = <String, dynamic>{
-      'valor': n.valor,
-      'rango': n.rango,
-      'tipo': n.tipo
-    };
+    int id;
+    if (nroVariable == n.id) {
+      // Añadir variable
+      id = nroVariable;
+    } else {
+      // Ya existe la variable
+      id = n.id;
+    }
+
+    map['variables'][id.toString()] = n.toMap();
+    nroVariable = cantVariables();
+    addListVar(n.name);
+
     notifyListeners();
   }
 
   void addRule(Regla regla) {
-    map[nroRegla.toString()] = {
-      'premisa': regla.premisa,
-      'conclusion': regla.hecho,
-    };
+    int id = nroRegla == regla.id ? nroRegla : regla.id;
+    final r = regla.toJson();
+    print(r);
+    map['reglas'][id.toString()] = regla.toJson();
+    nroRegla = cantReglas();
+    notifyListeners();
+  }
 
-    // Inclementar y agregar el número de regla
-    nroRegla++;
-    map['nroRegla'] = nroRegla;
+  void deleteVar(String id) {
+    if (variables.containsKey(id)) {
+      // Existe la variable
+      final variable = variables[id];
+      variables.remove(id);
+      deleteListVar(variable["name"]);
+      nroVariable = variables.length;
+      notifyListeners();
+    }
+  }
+
+  void deleteRule(String id) {
+    if (reglas.containsKey(id)) {
+      // Existe la variable
+      reglas.remove(id);
+      nroRegla = reglas.length;
+      notifyListeners();
+    }
+  }
+
+  Map<String, dynamic> getVariables() {
+    return map['variables'];
+  }
+
+  dynamic getVar(int id) {
+    return id == nroVariable ? {} : map['variables'][id];
+  }
+
+  Map<String, dynamic> getRelas() {
+    return map['reglas'];
   }
 
   // Obtener lista de valores de una variable escalar
-  List<String> getValues() {
-    return variable.isNotEmpty && !variable['tipo']
-        ? variable['valores'] as List<String>
-        : [];
-  }
+  // List<String> getValues() {
+  //   return variable.isNotEmpty && !variable['tipo']
+  //       ? variable['valores'] as List<String>
+  //       : [];
+  // }
 
   // Map to String
   String toStr() {
@@ -95,25 +123,57 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, dynamic> get variable => _variable;
+  List<String> get listVar => _listVar;
 
-  set variable(value) {
-    variable = value;
+  set listVar(value) {
+    listVar = value;
     notifyListeners();
   }
 
-  List<String> get listVar => _listVar;
+  List<String> getListVar() {
+    List<String> list = [];
+    // Obtener variables
+    final variables = map['variables'];
+    variables.forEach((key, value) {
+      // Accedemos al nombre de los archivos
+      list.add(value["name"]);
+      // print('Values ${value["name"]}');
+    });
+    return list;
+  }
+
+  // Obtener valores de variable escalar
+  List<String> getValoresEsc(String id) {
+    List<dynamic> list = variables[id]['valores'];
+    List<String> l = [];
+    for (var elem in list) {
+      String e = elem.toString();
+      l.add(e);
+    }
+    return l;
+  }
 
   void setListVar() {
     _listVar = getListVar();
     notifyListeners();
   }
 
-  List<String> getListVar() {
-    List<String> list = [];
-    map.forEach((key, value) {
-      list.add(key);
-    });
-    return list;
+  bool existeVar(String name) {
+    return listVar.contains(name);
+  }
+
+  void addListVar(String variable) {
+    if (!(listVar.contains(variable))) {
+      // Si no esta repetido
+      listVar.add(variable);
+      notifyListeners();
+    }
+  }
+
+  void deleteListVar(String variable) {
+    if (listVar.contains(variable)) {
+      listVar.remove(variable);
+      notifyListeners();
+    }
   }
 }

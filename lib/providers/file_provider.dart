@@ -39,8 +39,9 @@ class FileProvider extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> readFromFileToMap() async {
-    String data = await readFromFile();
-    return await jsonDecode(data);
+    String? data = await readFromFile();
+    final json = jsonDecode(data);
+    return json;
   }
 
   Future<void> saveFile(Future<String?> dialog) async {
@@ -58,5 +59,37 @@ class FileProvider extends ChangeNotifier {
     // Mostrar un mensaje de confirmación al usuario
     // que se guardó el archivo correctamente
     // y que está en el directorio de documentos
+  }
+
+  bool pathEndsWithExtension(String path) {
+    final RegExp regExp = RegExp(r'^\/.+\/[^\/]+\.\w+$');
+    return regExp.hasMatch(path);
+  }
+
+  Future<List<FileSystemEntity>> getFiles() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final List<FileSystemEntity> filesDirectory = directory.listSync();
+    final List<FileSystemEntity> files = [];
+    for (FileSystemEntity file in filesDirectory) {
+      if (file is File && pathEndsWithExtension(file.path)) {
+        files.add(file);
+      }
+    }
+
+    return files;
+  }
+
+  // Eliminar archivo
+  Future<void> deleteFile(String filename) async {
+    Directory appDir = await getApplicationDocumentsDirectory();
+    String filePath = '${appDir.path}/$filename';
+    File file = File(filePath);
+    if (await file.exists()) {
+      await file.delete();
+      notifyListeners();
+      print('$filename eliminado exitosamente');
+    } else {
+      print('$filename no encontrado');
+    }
   }
 }

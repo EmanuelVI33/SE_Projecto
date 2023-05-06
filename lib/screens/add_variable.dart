@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:archivos_prueba/models/models.dart';
 import 'package:archivos_prueba/providers/providers.dart';
 import 'package:archivos_prueba/ui/auth_decoration.dart';
+import 'package:archivos_prueba/widgets/dialog_change_var.dart';
 import 'package:archivos_prueba/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,8 @@ class AddVariable extends StatelessWidget {
   Widget build(BuildContext context) {
     final formVariable = Provider.of<FormVariableProvider>(context);
     final dataProvider = Provider.of<DataProvider>(context);
+    final Map<String, dynamic> variables = dataProvider.getVariables();
+
     return Scaffold(
       appBar: const MyAppBar(
         title: 'Añadir variable',
@@ -25,10 +28,10 @@ class AddVariable extends StatelessWidget {
             dataProvider: dataProvider,
             formVariable: formVariable,
           ),
-          _ListVariable(
-            dataProvider: dataProvider,
-            formVar: formVariable,
-          )
+          // _ListVariable(
+          //   dataProvider: dataProvider,
+          //   formVar: formVariable,
+          // )
         ],
       ),
     );
@@ -44,12 +47,9 @@ class _LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fileProvider = Provider.of<FileProvider>(context);
+    final Map<String, dynamic> variable = formVariable.variable;
     final size = MediaQuery.of(context).size;
-
-    Future<File> getLocalFile() async {
-      final directory = await getApplicationDocumentsDirectory();
-      return File('${directory.path}/${formVariable.path}');
-    }
+    print('Lista de valores ${formVariable.valores}');
 
     bool isEscalar = formVariable.tipoVariable == 'escalar';
     return Container(
@@ -60,47 +60,22 @@ class _LoginForm extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              'Añadir variable ${formVariable.tipoVariable}',
+            const Text(
+              'Agregar valores',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Row(
-                  children: [
-                    Radio(
-                        value: 'numerica',
-                        groupValue: formVariable.tipoVariable,
-                        onChanged: (value) =>
-                            formVariable.tipoVariable = value),
-                    const Text('Numerica'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Radio(
-                        value: 'escalar',
-                        groupValue: formVariable.tipoVariable,
-                        onChanged: (value) =>
-                            formVariable.tipoVariable = value),
-                    const Text('Escalar'),
-                  ],
-                ),
-              ],
-            ),
             TextFormField(
-              initialValue: formVariable.ident,
+              initialValue: formVariable.name,
               autocorrect: false,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecorations.authInputDecorations(
-                  hintText: 'Mi variable',
-                  labelText: 'Identificador',
-                  prefixIcon: Icons.alternate_email_rounded),
-              onChanged: (value) => formVariable.ident = value,
+                  hintText: '',
+                  labelText: 'Nombre',
+                  prefixIcon: Icons.abc_rounded),
+              onChanged: (value) => formVariable.name = value,
             ),
             const SizedBox(height: 30),
             Row(
@@ -110,7 +85,9 @@ class _LoginForm extends StatelessWidget {
                 SizedBox(
                   width: isEscalar ? size.width * 0.75 : size.width * 0.95,
                   child: TextFormField(
-                      initialValue: formVariable.valor.toString(),
+                      initialValue: formVariable.valor == null
+                          ? ''
+                          : formVariable.valor.toString(),
                       autocorrect: false,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecorations.authInputDecorations(
@@ -142,19 +119,18 @@ class _LoginForm extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            if (formVariable.tipoVariable == 'escalar')
-              if (formVariable.valores.isNotEmpty)
-                SizedBox(
-                  height: formVariable.sizeValores,
-                  child: ListView.builder(
-                    itemCount: formVariable.valores.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(formVariable.valores[index]),
-                      );
-                    },
-                  ),
+            if (isEscalar)
+              SizedBox(
+                height: formVariable.sizeValores,
+                child: ListView.builder(
+                  itemCount: formVariable.valores.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(formVariable.valores[index]),
+                    );
+                  },
                 ),
+              ),
             if (formVariable.tipoVariable == 'numerica')
               TextFormField(
                 initialValue: formVariable.rango,
@@ -167,6 +143,32 @@ class _LoginForm extends StatelessWidget {
                 onChanged: (value) => formVariable.rango = value,
               ),
             const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Row(
+                  children: [
+                    Radio(
+                        value: 'numerica',
+                        groupValue: formVariable.tipoVariable,
+                        onChanged: (value) async =>
+                            await _displayDialog(context, isEscalar, value)),
+                    const Text('Numerica'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio(
+                        value: 'escalar',
+                        groupValue: formVariable.tipoVariable,
+                        onChanged: (value) async =>
+                            await _displayDialog(context, isEscalar, value)),
+                    const Text('Escalar'),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
             MaterialButton(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -174,13 +176,38 @@ class _LoginForm extends StatelessWidget {
                 elevation: 0,
                 color: Colors.deepPurple,
                 onPressed: () async {
-                  if (isEscalar) {
-                  } else {
-                    dataProvider.addNumeric(Numeric(formVariable.ident,
-                        formVariable.valor, formVariable.rango));
+                  // Obtener variable
+                  final variable = dataProvider.variables[formVariable.id];
+
+                  if (variable["name"] != formVariable.name &&
+                      dataProvider.existeVar(formVariable.name)) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const DialogVarRepe(),
+                    );
+                    return;
                   }
 
-                  fileProvider.writeToFile(dataProvider.toStr());
+                  if (isEscalar) {
+                    Scale escalar = Scale(
+                        id: int.parse(formVariable.id),
+                        name: formVariable.name,
+                        valores: formVariable.valores);
+
+                    dataProvider.addScale(escalar);
+                  } else {
+                    Numeric numerica = Numeric(
+                        id: int.parse(formVariable.id),
+                        name: formVariable.name,
+                        valor: formVariable.valor,
+                        rango: formVariable.rango);
+
+                    dataProvider.addNumeric(numerica);
+                  }
+
+                  Navigator.pop(context);
+
+                  // fileProvider.writeToFile(dataProvider.toStr());
                 },
                 child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -192,6 +219,19 @@ class _LoginForm extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _displayDialog(
+      BuildContext context, bool isEscalar, String? value) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return DialogChangeVar(
+            isEscalar: isEscalar,
+            idVariable: int.parse(formVariable.id),
+            name: formVariable.name);
+      },
     );
   }
 }

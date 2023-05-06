@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 
 class FormVariableProvider extends ChangeNotifier {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  String ident = "";
+  String id = "";
+  String name = "";
   dynamic valor = 0;
-  List<String> valores = [];
+  List<dynamic> valores = [];
   String rango = "";
+  Map<String, dynamic> variable = {};
   bool _isLoading = false;
   String path = 'my_file.txt';
   String _tipoVariable = 'numerica';
   double _sizeValores = 0;
+  bool _isAddVar = true;
 
   bool get isLoading => _isLoading;
 
@@ -32,15 +35,24 @@ class FormVariableProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isAddVar => _isAddVar;
+
+  set isAddVar(value) {
+    _isAddVar = value;
+    notifyListeners();
+  }
+
   void addValor(String item) {
     if (!valores.contains(item)) {
-      valores.add(item);
+      valores!.add(item);
       notifyListeners();
     }
   }
 
   void delValor(int index) {
-    valores.removeAt(index);
+    if (valores != null) {
+      valores.removeAt(index);
+    }
   }
 
   bool isValidForm() => formKey.currentState?.validate() ?? false;

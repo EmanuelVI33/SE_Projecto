@@ -1,5 +1,6 @@
 import 'package:archivos_prueba/models/models.dart';
 import 'package:archivos_prueba/providers/data_provider.dart';
+import 'package:archivos_prueba/providers/form_literal_provider.dart';
 import 'package:archivos_prueba/providers/form_rule_provider.dart';
 import 'package:archivos_prueba/widgets/dialog_rule.dart';
 import 'package:archivos_prueba/widgets/widgets.dart';
@@ -15,6 +16,16 @@ class AddRule extends StatelessWidget {
     final formRuleProvider = Provider.of<FormRuleProvider>(context);
     final premisa = formRuleProvider.premisa;
     final size = MediaQuery.of(context).size;
+    bool isNullConclusion = formRuleProvider.conclusion == null;
+    int sizeConclucion = isNullConclusion ? 0 : 1;
+    double sizeIf = 92;
+    if (!isNullConclusion) {
+      sizeIf += 50;
+    }
+
+    if (premisa.isNotEmpty) {
+      sizeIf += (premisa.length * 50);
+    }
 
     return Scaffold(
       appBar: const MyAppBar(title: 'Añadir regla'),
@@ -38,11 +49,10 @@ class AddRule extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
                     width: double.infinity,
-                    height: premisa.isNotEmpty
-                        ? 72 * (premisa.length.toDouble() + 1)
-                        : 110,
+                    height: sizeIf,
                     decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(10)),
@@ -71,6 +81,10 @@ class AddRule extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   var data =
                                       '${premisa[index].ident} ${premisa[index].oprel} ${premisa[index].valor}';
+                                  if (premisa[index].neg) {
+                                    data = '¬ $data';
+                                  }
+
                                   return ListTile(
                                     title: Row(
                                       children: [
@@ -85,7 +99,38 @@ class AddRule extends StatelessWidget {
                                                 color: Colors.orange)),
                                       ],
                                     ),
-                                    onTap: () {},
+                                    onTap: () async {
+                                      final formLiteral =
+                                          Provider.of<FormLiteralProvider>(
+                                              context,
+                                              listen: false);
+
+                                      Literal literal = premisa[index];
+
+                                      formLiteral.selectOption = 'premisa';
+                                      formLiteral.variableValue = literal.ident;
+                                      formLiteral.value = literal.valor;
+                                      formLiteral.operadorValue = literal.oprel;
+                                      formLiteral.negacion = literal.neg;
+
+                                      await showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return const DialogAddForm();
+                                        },
+                                      );
+                                    },
+                                    onLongPress: () async {
+                                      await showDialog(
+                                        context: context,
+                                        builder: (context) => DialogDeleteVar(
+                                            function: () => formRuleProvider
+                                                .deleteLiteral(index),
+                                            title:
+                                                '¿Deseas eliminar el literal?'),
+                                      );
+                                      // Quitar de la lista
+                                    },
                                   );
                                 }),
                           ),
@@ -99,13 +144,44 @@ class AddRule extends StatelessWidget {
                         ),
                         if (formRuleProvider.conclusion != null)
                           const SizedBox(
-                            height: 10,
+                            height: 5,
                           ),
                         if (formRuleProvider.conclusion != null)
-                          Text(
-                            '    ${formRuleProvider.conclusion!.ident} = ${formRuleProvider.conclusion!.valor}',
-                            style: const TextStyle(color: Colors.orange),
-                            textAlign: TextAlign.center,
+                          TextButton(
+                            onLongPress: () => showDialog(
+                              context: context,
+                              builder: (context) => DialogDeleteVar(
+                                  function: () {
+                                    formRuleProvider.setConclucion(null);
+                                    Navigator.pop(context);
+                                  },
+                                  title: '¿Deseas eliminar la conclusión?'),
+                            ),
+                            onPressed: () async {
+                              if (formRuleProvider.conclusion == null) {
+                                return;
+                              }
+                              final formLiteral =
+                                  Provider.of<FormLiteralProvider>(context,
+                                      listen: false);
+
+                              // Inicializamos la conclución
+                              formLiteral.selectOption = 'conclusion';
+                              Hecho conclusion = formRuleProvider.conclusion!;
+                              formLiteral.variableValue = conclusion.ident;
+                              formLiteral.value = conclusion.valor;
+                              await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return const DialogAddForm();
+                                },
+                              );
+                            },
+                            child: Text(
+                              '    ${formRuleProvider.conclusion!.ident} = ${formRuleProvider.conclusion!.valor}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.orange),
+                            ),
                           ),
                       ],
                     ),
@@ -137,10 +213,14 @@ class AddRule extends StatelessWidget {
                               Hecho hecho = formRuleProvider.conclusion!;
 
                               // Cumple los requisitos para ser una regla
-                              dataProvider.addRule(Regla(dataProvider.nroRegla,
-                                  formRuleProvider.premisa, hecho));
+                              Regla regla = Regla(
+                                  id: dataProvider.nroRegla,
+                                  premisa: premisa,
+                                  hecho: hecho);
 
-                              formRuleProvider.conclusion = null;
+                              dataProvider.addRule(regla);
+
+                              formRuleProvider.setConclucion(null);
                               formRuleProvider.premisa = [];
 
                               Navigator.pop(context);
@@ -148,7 +228,11 @@ class AddRule extends StatelessWidget {
                               await showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return const DialogRule();
+                                  return const DialogRule(
+                                    title: 'Regla incorecta',
+                                    content:
+                                        'Debe agregar la premisa y la conclusión',
+                                  );
                                 },
                               );
                             }
@@ -210,70 +294,3 @@ class _MyButton extends StatelessWidget {
     );
   }
 }
-
-// Flexible(
-                //   flex: 1,
-                //   child: Row(
-                //     children: [
-                //       ListTile(
-                //         title: const Text(
-                //           'Regla',
-                //           style: TextStyle(fontSize: 10),
-                //         ),
-                //         leading: Radio(
-                //           value: 'regla',
-                //           groupValue: formRuleProvider.selectOption,
-                //           onChanged: (value) {
-                //             formRuleProvider.selectOption = value;
-                //           },
-                //         ),
-                //       ),
-                //       ListTile(
-                //         title: const Text(
-                //           'Conclusión',
-                //           style: TextStyle(fontSize: 10),
-                //         ),
-                //         leading: Radio(
-                //           value: 'conclusion',
-                //           groupValue: formRuleProvider.selectOption,
-                //           onChanged: (value) {
-                //             formRuleProvider.selectOption = value;
-                //           },
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-
-
- // DropdownButton(
-              //   hint: Text('Selecciona una opción'),
-              //   items: dataProvider.listVar.isNotEmpty
-              //       ? dataProvider.listVar
-              //           .map<DropdownMenuItem<String>>((String value) {
-              //           return DropdownMenuItem<String>(
-              //             value: value,
-              //             child: Text(value),
-              //           );
-              //         }).toList()
-              //       : null, // si la lista está vacía, el menú desplegable será nulo
-              //   onChanged: (value) {
-              //     formRuleProvider.dropdownValue = value;
-              //   },
-              // ),
-
-// for (var i = 0; i <= premisa.length; i++)
-//                   Container(
-//                       child: TextButton(
-//                           onPressed: () {}, child: Text(premisa[i].ident))),
-
-// Expanded(
-                //   child: ListView.builder(
-                //     itemCount: formRuleProvider.premisa.length,
-                //     itemBuilder: (context, index) {
-                //       return TextButton(
-                //           onPressed: () {},
-                //           child: Text(formRuleProvider.premisa[index].ident));
-                //     },
-                //   ),
-                // ),

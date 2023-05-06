@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 
 class DialogRule extends StatelessWidget {
-  const DialogRule({super.key});
+  const DialogRule({super.key, required this.title, required this.content});
+
+  final String title;
+  final String content;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Regla incorecto'),
+      title: Text(title),
       icon: const Icon(
         Icons.warning,
         color: Colors.yellow,
         size: 30,
       ),
-      content: const Text(
-        'Verifique la premisa o la conclusión',
+      content: Text(
+        content,
         maxLines: 3,
         textAlign: TextAlign.center,
       ),

@@ -1,5 +1,7 @@
 import 'package:archivos_prueba/providers/providers.dart';
 import 'package:archivos_prueba/screens/add_rule.dart';
+import 'package:archivos_prueba/screens/mostrar_reglas.dart';
+import 'package:archivos_prueba/screens/mostrar_variables.dart';
 import 'package:archivos_prueba/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +43,8 @@ class MyApp extends StatelessWidget {
           'add_variable': (context) => const AddVariable(),
           'menu': (context) => const MenuScreen(),
           'add_rule': (context) => const AddRule(),
+          'mostrar_variables': (context) => const MostrarVariables(),
+          'mostrar_reglas': (context) => const MostrarReglas(),
         },
       ),
     );
