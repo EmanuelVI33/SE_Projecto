@@ -224,13 +224,16 @@ class _LoginForm extends StatelessWidget {
 
   Future<void> _displayDialog(
       BuildContext context, bool isEscalar, String? value) async {
+    List<String> list = dataProvider.getListReglaVar(formVariable.name);
     await showDialog(
       context: context,
       builder: (context) {
         return DialogChangeVar(
-            isEscalar: isEscalar,
-            idVariable: int.parse(formVariable.id),
-            name: formVariable.name);
+          isEscalar: isEscalar,
+          idVariable: int.parse(formVariable.id),
+          name: formVariable.name,
+          reglas: list,
+        );
       },
     );
   }

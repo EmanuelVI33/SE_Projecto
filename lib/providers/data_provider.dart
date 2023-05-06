@@ -85,12 +85,9 @@ class DataProvider extends ChangeNotifier {
   }
 
   void deleteRule(String id) {
-    if (reglas.containsKey(id)) {
-      // Existe la variable
-      reglas.remove(id);
-      nroRegla = reglas.length;
-      notifyListeners();
-    }
+    reglas.remove(id);
+    nroRegla = reglas.length;
+    notifyListeners();
   }
 
   Map<String, dynamic> getVariables() {
@@ -174,6 +171,37 @@ class DataProvider extends ChangeNotifier {
     if (listVar.contains(variable)) {
       listVar.remove(variable);
       notifyListeners();
+    }
+  }
+
+  // Elimina las reglas que contenga esa variable
+  void deleteListInVar(String id) {
+    // Obtener variable
+    Map<String, dynamic> variable = variables[id];
+
+    String name = variable["name"];
+    List<String> listRules = getListReglaVar(name);
+    deleteRulesVar(listRules);
+    notifyListeners();
+  }
+
+  List<String> getListReglaVar(String name) {
+    List<String> list = [];
+    reglas.forEach((key, value) {
+      List<dynamic> premisa = value['premisa'];
+      final hecho = value['conclusion'];
+      if (premisa.contains(name)) {
+        list.add(key);
+      } else if (hecho['ident'] == name) {
+        list.add(key);
+      }
+    });
+    return list;
+  }
+
+  void deleteRulesVar(List<String> list) {
+    for (String id in list) {
+      deleteRule(id);
     }
   }
 }

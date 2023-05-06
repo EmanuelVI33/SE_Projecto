@@ -6,15 +6,15 @@ import 'package:path_provider/path_provider.dart';
 
 class FileProvider extends ChangeNotifier {
   String _fileName = '';
-  String _content = '';
+  String _fileVista = '';
 
   String get fileName => _fileName;
 
   set fileName(String file) => _fileName = file;
 
-  String get content => _content;
+  String get fileVista => _fileVista;
 
-  set content(String s) => _content = s;
+  set fileVista(String file) => _fileVista = file;
 
   Future<File> getLocalFile() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -91,5 +91,18 @@ class FileProvider extends ChangeNotifier {
     } else {
       print('$filename no encontrado');
     }
+  }
+
+  String fileNameTxt(String name) {
+    int pos = name.lastIndexOf('.');
+    String extension = name.substring(pos + 1, name.length - 1);
+    if (extension == 'txt') {
+      return name;
+    } else if (pos == -1) {
+      name = '$name.txt';
+    } else {
+      name = name.substring(0, pos - 1);
+    }
+    return name;
   }
 }

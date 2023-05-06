@@ -38,12 +38,10 @@ class MenuScreen extends StatelessWidget {
               child: GridView.count(
                 crossAxisCount: 2,
                 children: [
-                  _buildMenuItem(context, 'Mostrar variables', Icons.ac_unit,
-                      () {
+                  _buildMenuItem(context, 'Mostrar variables', Icons.abc, () {
                     Navigator.pushNamed(context, 'mostrar_variables');
                   }),
-                  _buildMenuItem(context, 'Mostrar reglas', Icons.access_alarm,
-                      () {
+                  _buildMenuItem(context, 'Mostrar reglas', Icons.rule, () {
                     Navigator.pushNamed(context, 'mostrar_reglas');
                   }),
                   // _buildMenuItem(context, 'Opción 3', Icons.accessibility),

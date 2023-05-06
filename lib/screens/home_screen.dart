@@ -19,28 +19,53 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('Base de conocimientos',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center),
-              IconButton(
-                  onPressed: () async {
-                    await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return DialogNameFile(
-                            filaProvider: fileProvider,
-                            dataProvider: dataProvider);
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text('Base de conocimientos',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center),
+                  IconButton(
+                      onPressed: () async {
+                        await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return DialogNameFile(
+                                filaProvider: fileProvider,
+                                dataProvider: dataProvider);
+                          },
+                        );
                       },
-                    );
-                  },
-                  icon: const Icon(Icons.add_box_rounded)),
+                      icon: const Icon(
+                        Icons.add_box_rounded,
+                        size: 30,
+                        color: Colors.blueAccent,
+                      )),
+                ],
+              ),
               const SizedBox(
                 height: 10,
               ),
               const SelectFile(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text(
+                    'Mantener presionado para eliminar',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.black26),
+                  ),
+                  Icon(
+                    Icons.delete,
+                    size: 20,
+                    color: Colors.redAccent,
+                  ),
+                ],
+              )
             ],
           ),
         ),
@@ -53,7 +78,7 @@ class HomeScreen extends StatelessWidget {
       title: const Text(
         'Sistemas experto',
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       ),
       backgroundColor: Colors.indigo,
       actions: [],

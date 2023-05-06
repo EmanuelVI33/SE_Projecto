@@ -17,8 +17,12 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           onPressed: () {
-            print(mapText);
-            fileProvider.writeToFile(mapText);
+            showDialog(
+              context: context,
+              builder: (context) => DialogGuardar(
+                function: () => fileProvider.writeToFile(mapText),
+              ),
+            );
           },
           icon: const Icon(Icons.save),
         ),
@@ -35,4 +39,25 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class DialogGuardar extends StatelessWidget {
+  const DialogGuardar({super.key, required this.function});
+
+  final VoidCallback function;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Deseas guardar el archivo?'),
+      actions: [
+        ElevatedButton(onPressed: function, child: Text('Aceptar')),
+        ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text('Cancelar')),
+      ],
+    );
+  }
 }

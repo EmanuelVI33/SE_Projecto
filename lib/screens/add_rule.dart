@@ -244,6 +244,24 @@ class AddRule extends StatelessWidget {
                           )),
                     ],
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        'Mantener presionado para eliminar',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14, color: Colors.black26),
+                      ),
+                      Icon(
+                        Icons.delete,
+                        size: 20,
+                        color: Colors.redAccent,
+                      ),
+                    ],
+                  )
                 ],
               ),
             )),

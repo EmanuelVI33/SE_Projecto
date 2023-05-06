@@ -1,5 +1,7 @@
 import 'package:archivos_prueba/providers/data_provider.dart';
 import 'package:archivos_prueba/providers/file_provider.dart';
+import 'package:archivos_prueba/widgets/dialog_change_var.dart';
+import 'package:archivos_prueba/widgets/dialog_rule.dart';
 import 'package:flutter/material.dart';
 
 class DialogNameFile extends StatelessWidget {
@@ -31,7 +33,21 @@ class DialogNameFile extends StatelessWidget {
         ),
         TextButton(
           child: Text('Guardar'),
-          onPressed: () {
+          onPressed: () async {
+            String fileName = filaProvider.fileName;
+            int pos = fileName.lastIndexOf('.');
+            String ext = fileName.substring(pos + 1, fileName.length);
+            print(ext);
+            if (ext != 'txt') {
+              Navigator.pop(context);
+              await showDialog(
+                context: context,
+                builder: (context) => const DialogRule(
+                    title: 'Extensión incorecta',
+                    content: 'Los archivos tiene extenxió .txt'),
+              );
+              return;
+            }
             filaProvider.writeToFile(dataProvider.toStr());
             Navigator.of(context).pop();
           },
